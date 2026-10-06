@@ -1,0 +1,410 @@
+<!doctype html>
+<html lang="en" class="theme-blue">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="content-language" content="en" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="google-site-verification" content="3e1cNRYuUBDvzPJ9VerwCKlrqiCwBDo_3DefS4u__3o" />
+    <meta name="author" content="Playcode" />
+    <meta name="robots" content="noodp, noydir, notranslate" />
+    <meta name="renderer" content="browser" />
+    <meta property="og:site_name" content="Playcode.io" />
+    <meta property="og:image" content="https://playcode.io/marketing/assets/static/img/og/default.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@playcode_io" />
+    <meta name="twitter:image" content="https://playcode.io/marketing/assets/static/img/og/default.webp" />
+
+    <!-- SEO: Fallback title/description before JS hydrates (AI Website Builder positioning) -->
+    <title>Playcode - Build apps and sites with AI</title>
+    <meta
+      name="description"
+      content="Build any website with AI. Describe what you need, AI creates it in minutes. Visual editing, custom domains. 2.7 million projects built since 2016."
+    />
+
+    <!-- Brand type system: Fraunces (editorial display + numerals) + JetBrains Mono
+         (folios, roles, IDs). Loaded async (media="print" swap) so it never blocks
+         first paint; the app keeps its Inter-only critical path. Mirrors the
+         marketing loader (renderer/+onRenderHtml.ts) so the app renders the SAME
+         serif the landing does, instead of the Georgia stand-in .pc-serif fell back
+         to before. Docs: docs/marketing/07-brand.md §6.3. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
+
+    <script>
+      // Global polyfill (vite-plugin-node-polyfills handles process, Buffer, etc.)
+      window.global = window
+    </script>
+
+    <script>
+      ;(function () {
+        function makeMemoryStorage() {
+          var values = {}
+          return {
+            get length() {
+              return Object.keys(values).length
+            },
+            key: function (index) {
+              return Object.keys(values)[index] || null
+            },
+            getItem: function (key) {
+              return Object.prototype.hasOwnProperty.call(values, key) ? values[key] : null
+            },
+            setItem: function (key, value) {
+              values[key] = String(value)
+            },
+            removeItem: function (key) {
+              delete values[key]
+            },
+            clear: function () {
+              values = {}
+            },
+          }
+        }
+
+        function ensureStorage(name) {
+          var key = '__pc_storage_probe__'
+          try {
+            var storage = window[name]
+            storage.setItem(key, '1')
+            storage.removeItem(key)
+            return
+          } catch (error) {
+            window.__pcStorageFallbacks = window.__pcStorageFallbacks || {}
+            window.__pcStorageFallbacks[name] = {
+              reason: error && error.name + ': ' + error.message,
+            }
+          }
+
+          try {
+            Object.defineProperty(window, name, {
+              configurable: true,
+              value: makeMemoryStorage(),
+            })
+          } catch (error) {
+            window.__pcStorageFallbacks[name].installError = error && error.name + ': ' + error.message
+          }
+        }
+
+        ensureStorage('localStorage')
+        ensureStorage('sessionStorage')
+      })()
+    </script>
+
+    <script>
+      ;(function () {
+        var entries = (window.__pcPreDebugEntries = window.__pcPreDebugEntries || [])
+        var nextId = entries.length + 1
+
+        function serializeError(error) {
+          if (!error) return null
+          if (error instanceof Error) {
+            return {
+              name: error.name,
+              message: error.message,
+              stack: error.stack || null,
+            }
+          }
+          return String(error)
+        }
+
+        function describeTarget(target) {
+          if (!target || !target.tagName) return null
+          var tagName = String(target.tagName).toLowerCase()
+          return {
+            tagName: tagName,
+            src: target.src || target.currentSrc || null,
+            href: target.href || null,
+            rel: target.rel || null,
+            as: target.as || null,
+            type: target.type || null,
+            id: target.id || null,
+            className: typeof target.className === 'string' ? target.className : null,
+          }
+        }
+
+        function add(type, level, message, detail) {
+          entries.push({
+            id: nextId++,
+            type: type,
+            level: level,
+            time: new Date().toISOString(),
+            message: message,
+            detail: detail || {},
+          })
+          if (entries.length > 100) {
+            entries.splice(0, entries.length - 100)
+          }
+        }
+
+        add('lifecycle', 'info', 'Pre-debug trap installed', {
+          href: window.location.href,
+        })
+
+        window.addEventListener(
+          'error',
+          function (event) {
+            var target = event.target
+            if (target && target !== window && target.tagName) {
+              var resource = describeTarget(target)
+              add('resource', 'error', 'Resource failed to load', resource || {})
+              return
+            }
+
+            add('error', 'error', event.message || 'window error before app bootstrap', {
+              filename: event.filename || '',
+              lineno: event.lineno || 0,
+              colno: event.colno || 0,
+              error: serializeError(event.error),
+            })
+          },
+          true,
+        )
+
+        window.addEventListener('unhandledrejection', function (event) {
+          add('rejection', 'error', 'Unhandled promise rejection before app bootstrap', {
+            reason: serializeError(event.reason),
+          })
+        })
+      })()
+    </script>
+
+    <!-- Favicon setup optimized for Google Search (circular crop) and browsers -->
+    <!-- See: https://developers.google.com/search/docs/appearance/favicon-in-search -->
+    <link rel="icon" href="/static/img/favicons/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/static/img/favicons/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicons/favicon-96x96.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/favicons/apple-touch-icon-v2.png" />
+    <link rel="manifest" href="/static/img/favicons/site.webmanifest" />
+
+    <style>
+      body,
+      button,
+      html,
+      input,
+      select,
+      textarea {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
+          'Open Sans',
+          'Helvetica Neue';
+      }
+
+      /* Loading screen styles */
+      .loading-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        background: #ffffff;
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 99999;
+      }
+
+      /* Subtle warm gradient glow */
+      .loading-screen::before {
+        content: '';
+        position: absolute;
+        top: -120px;
+        right: -80px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, rgba(245, 158, 11, 0.03) 50%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(60px);
+      }
+
+      .loading-screen::after {
+        content: '';
+        position: absolute;
+        bottom: -80px;
+        left: -60px;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(158, 0, 255, 0.05) 0%, rgba(202, 46, 46, 0.02) 50%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+        filter: blur(60px);
+      }
+
+      /* Marketing bracket logo */
+      .loading-logo-wrapper {
+        width: 240px;
+        max-width: 70vw;
+        opacity: 0;
+        animation: fadeInLogo 0.8s ease-out 0.1s forwards;
+      }
+
+      .loading-logo-wrapper svg {
+        width: 100%;
+        height: auto;
+      }
+
+      /* Progress bar container */
+      .loading-progress {
+        margin-top: 28px;
+        width: 180px;
+        height: 3px;
+        background: #f3f4f6;
+        border-radius: 3px;
+        overflow: hidden;
+        opacity: 0;
+        animation: fadeInLogo 0.4s ease-out 0.5s forwards;
+      }
+
+      .loading-progress-bar {
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, #f97316, #f59e0b);
+        border-radius: 3px;
+        animation: progressSlide 1.5s ease-in-out infinite;
+      }
+
+      @keyframes fadeInLogo {
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes progressSlide {
+        0% {
+          transform: translateX(-100%);
+        }
+        50% {
+          transform: translateX(250%);
+        }
+        100% {
+          transform: translateX(450%);
+        }
+      }
+    </style>
+    <script type="module" crossorigin src="/static/index-2dxPePds.js"></script>
+    <link rel="modulepreload" crossorigin href="/static/rolldown-runtime-DAXXjFlN.js">
+    <link rel="modulepreload" crossorigin href="/static/reflection-K_kXvInf.js">
+    <link rel="modulepreload" crossorigin href="/static/dist-Bnj2Qb5M.js">
+    <link rel="modulepreload" crossorigin href="/static/reactivity.esm-bundler-Cb7szri3.js">
+    <link rel="modulepreload" crossorigin href="/static/runtime-core.esm-bundler-CM7de_yc.js">
+    <link rel="modulepreload" crossorigin href="/static/runtime-dom.esm-bundler-Br6KfIUr.js">
+    <link rel="modulepreload" crossorigin href="/static/dist-B__0KrVp.js">
+    <link rel="modulepreload" crossorigin href="/static/pinia-BSdvFYKH.js">
+    <link rel="modulepreload" crossorigin href="/static/keyboard-shortcuts-CQTiCcct.js">
+    <link rel="modulepreload" crossorigin href="/static/preload-helper-CZgWQFsJ.js">
+    <link rel="modulepreload" crossorigin href="/static/analytics-FosWtD7u.js">
+    <link rel="modulepreload" crossorigin href="/static/log-AajcVa8Y.js">
+    <link rel="modulepreload" crossorigin href="/static/dist-iEk06uCQ.js">
+    <link rel="modulepreload" crossorigin href="/static/use-id-CAjqlHv-.js">
+    <link rel="modulepreload" crossorigin href="/static/use-deprecated-DPjPBLBS.js">
+    <link rel="modulepreload" crossorigin href="/static/constants-BZq-ljSg.js">
+    <link rel="modulepreload" crossorigin href="/static/typescript-DOc6skV4.js">
+    <link rel="modulepreload" crossorigin href="/static/use-form-common-props-CiEI8EUQ.js">
+    <link rel="modulepreload" crossorigin href="/static/input-BAkH5kXt.js">
+    <link rel="modulepreload" crossorigin href="/static/tooltip-LLE-Ixey.js">
+    <link rel="modulepreload" crossorigin href="/static/message-xSKMpLqO.js">
+    <link rel="modulepreload" crossorigin href="/static/tsyringe-N8s6avIS.js">
+    <link rel="modulepreload" crossorigin href="/static/confirm.service-Qk8VlpNY.js">
+    <link rel="modulepreload" crossorigin href="/static/popup-DNEVCwq2.js">
+    <link rel="modulepreload" crossorigin href="/static/vue-router-BPp-szSQ.js">
+    <link rel="modulepreload" crossorigin href="/static/dist-u5p_KAIj.js">
+    <link rel="modulepreload" crossorigin href="/static/isSymbol-DisBR42n.js">
+    <link rel="modulepreload" crossorigin href="/static/utils-C-XDY7EI.js">
+    <link rel="modulepreload" crossorigin href="/static/configs-CI8hA6wV.js">
+    <link rel="modulepreload" crossorigin href="/static/urql-w1tuVLV3.js">
+    <link rel="modulepreload" crossorigin href="/static/decorate-B3KLIx2E.js">
+    <link rel="modulepreload" crossorigin href="/static/cache-getter-DCXKwwyr.js">
+    <link rel="modulepreload" crossorigin href="/static/events-C0ns3XC3.js">
+    <link rel="modulepreload" crossorigin href="/static/FileUpload-CTEeNV4r.js">
+    <link rel="modulepreload" crossorigin href="/static/AccessController-CUKf_TRe.js">
+    <link rel="modulepreload" crossorigin href="/static/db-DQUvgUum.js">
+    <link rel="modulepreload" crossorigin href="/static/esm-CCKiwo0U.js">
+    <link rel="modulepreload" crossorigin href="/static/luxon-DSj2Jv3t.js">
+    <link rel="modulepreload" crossorigin href="/static/workspace.model-B2y07rUf.js">
+    <link rel="modulepreload" crossorigin href="/static/model-Ds_s8xLr.js">
+    <link rel="modulepreload" crossorigin href="/static/chat-message.model-DD9LnmH5.js">
+    <link rel="modulepreload" crossorigin href="/static/json-o7fYZYU-.js">
+    <link rel="modulepreload" crossorigin href="/static/local-storage-D6c-wSaD.js">
+    <link rel="modulepreload" crossorigin href="/static/store3-BwT37hlb.js">
+    <link rel="stylesheet" crossorigin href="/static/confirm-BlLQXIAt.css">
+    <link rel="stylesheet" crossorigin href="/static/index-BK-Pf2Gz.css">
+  </head>
+
+  <body style="width: 100%; height: 100%; position: relative" id="body">
+    <div id="app" class="playcode">
+      <!-- Loading placeholder -->
+      <div class="loading-screen">
+        <div class="loading-logo-wrapper">
+          <!-- Playcode bracket logo from marketing (intro-logo-up-bg.svg) -->
+          <svg viewBox="130 -10 740 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Main bracket shape - filled -->
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M474.078 15.4314L465.839 22.7227C449.195 37.4551 439.388 60.7524 439.409 85.4978L439.911 599.085C439.932 623.706 449.697 646.878 466.237 661.586C489.781 682.511 522.108 682.161 545.297 660.687L831.678 395.703C847.653 380.92 857 358.148 857 334.001V333.103C857 308.831 847.528 285.934 831.406 271.151L552.762 16.1805C529.614 -5.0192 497.518 -5.31885 474.078 15.4314ZM154.426 306.617C168.595 293.548 327.09 158.616 327.09 158.616C336.932 150.194 350.829 158.356 350.829 172.58V216.487C350.829 221.878 348.671 226.987 344.987 230.257L245.207 323.996C240.92 328.023 241.018 334.863 245.419 338.766L344.671 426.776C348.541 430.045 350.829 435.263 350.829 440.805V490.427C350.829 504.652 336.913 512.836 327.071 504.37C327.071 504.37 169.452 369.733 154.407 355.85C139.362 341.966 140.256 319.686 154.426 306.617ZM559.793 158.615C559.793 158.615 718.288 293.547 732.457 306.616C746.627 319.686 747.521 341.965 732.476 355.849C717.431 369.733 559.812 504.37 559.812 504.37C549.97 512.835 536.054 504.651 536.054 490.427V440.805C536.054 435.262 538.342 430.044 542.212 426.775L641.464 337.765C645.865 333.863 645.963 327.023 641.676 322.995L541.896 229.256C538.212 225.987 536.054 220.877 536.054 215.487V171.58C536.054 157.356 549.951 149.194 559.793 158.615Z"
+              fill="url(#paint1_linear)"
+            />
+            <!-- Bracket outline with gradient -->
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M501.462 0.761564C483.339 4.5354 458.338 25.3088 448.458 44.8038C446.953 47.7732 444.462 54.2094 442.925 59.1037L440.13 68.0044V613.345L442.874 622.817C446.824 636.461 453.219 647.801 462.446 657.526C481.976 678.109 508.241 682.695 532.517 669.758C537.576 667.062 575.8 632.422 679.691 536.385C756.877 465.034 825.128 401.454 831.361 395.097C847.185 378.96 853.754 365.536 856.375 343.974C859.51 318.199 850.663 290.469 833.925 273.606C819.313 258.884 550.881 14.1531 544.845 10.049C541.307 7.64364 535.376 4.54054 531.665 3.15153C523.925 0.256587 509.405 -0.892139 501.462 0.761564ZM530.953 5.74323C534.401 7.0166 540.113 10.0259 543.647 12.4313C550.289 16.9504 822.246 265.052 833.514 276.872C841.245 284.98 849.736 301.54 852.188 313.288C854.485 324.289 854.432 342.874 852.075 353.537C849.601 364.733 842.39 379.688 835.913 387.059C830.608 393.094 549.275 653.889 539.487 661.843C532.26 667.718 522.283 672.161 512.786 673.734C483.002 678.668 453.026 654.595 444.687 619.045C442.614 610.21 442.513 597.013 442.513 338.889V68.0044L445.756 58.4793C450.63 44.1703 456.599 35.1231 468.962 23.3018C489.532 3.63338 509.732 -2.08841 530.953 5.74323ZM544.93 153.59C540.531 155.594 536.569 159.792 534.886 164.231C533.137 168.847 533.196 219.45 534.957 224.5C535.904 227.216 551.187 242.329 587.06 276.019C614.978 302.24 638.591 325.245 639.534 327.14C640.77 329.63 640.932 331.492 640.117 333.845C639.397 335.924 620.671 353.378 588.387 382.063C560.556 406.791 536.846 428.752 535.7 430.863C533.869 434.239 533.617 438.427 533.617 465.518C533.617 494.698 533.75 496.57 536.138 500.82C538.993 505.896 545.966 510.351 551.047 510.345C552.922 510.342 556.208 509.273 558.349 507.968C561.871 505.821 683.167 402.392 719.398 370.641C741.952 350.875 744.494 347.165 745.349 332.765C745.818 324.855 745.493 322.799 742.861 317.052C741.195 313.415 737.512 308.131 734.677 305.308C727.251 297.918 570.922 163.951 561.007 156.481C555.787 152.548 549.643 151.443 544.93 153.59ZM285.05 193.861C208.051 259.474 156.9 303.574 152.293 308.318C147.092 313.672 143 323.726 143 331.149C143 340.783 146.944 348.525 156.442 357.537C167.559 368.085 322.762 501.235 328.398 505.059C333.523 508.536 336.397 508.694 341.807 505.792C349.721 501.55 350.223 499.139 350.163 465.717C350.126 445.236 351.5 439.5 348.675 432.587C348.675 428 325.373 409.825 296.031 383.769C250.664 343.482 244.694 337.775 243.7 333.751C242.799 330.103 243.001 328.461 244.724 325.415C245.905 323.33 269.127 300.751 296.328 275.24C323.53 249.729 346.781 227.225 347.996 225.231C349.981 221.979 350.208 218.807 350.213 194.457C350.217 165.046 349.837 162.967 343.53 158.007C341.428 156.354 338.638 155.521 335.205 155.521C330.152 155.521 329.073 156.346 285.05 193.861ZM560.023 158.795C569.6 166.71 648.594 234.146 686.538 266.798C709.403 286.474 729.786 303.989 731.833 305.721C737.373 310.409 742.163 320.057 742.874 327.96C744.088 341.486 739.915 349.184 723.566 363.579C685.073 397.472 557.5 506.044 555.065 506.982C548.515 509.508 540.269 504.827 537.265 496.876C536.495 494.84 536.006 482.229 536.017 464.727C536.037 437.058 536.141 435.757 538.697 431.512C540.166 429.073 563.291 407.668 590.306 383.741C617.228 359.896 640.139 339.128 641.217 337.588C643.954 333.68 643.663 328.001 640.5 323.64C639.026 321.608 615.505 299.042 588.23 273.495C553.574 241.03 538.243 225.903 537.319 223.253C535.293 217.44 535.555 169.604 537.641 164.613C541.524 155.318 552.395 152.492 560.023 158.795ZM343.351 161.375L347.239 164.847L347.602 191.929C347.861 211.319 347.55 220.013 346.507 222.532C345.661 224.574 324.013 245.817 294.935 273.138C267.373 299.036 243.817 321.769 242.588 323.654C240.049 327.555 240.373 336.241 243.187 339.714C244.087 340.824 266.794 361.187 293.649 384.965C320.504 408.744 343.682 429.884 345.156 430.944C347.76 434.581 347.836 435.513 347.836 464.802C347.836 497.388 347.318 499.995 340.081 503.891C336.317 505.918 335.742 505.939 332.105 504.19C326.734 501.607 161.882 360.355 152.881 350.622C146.647 343.881 144.32 330.411 147.682 320.533C148.555 317.969 151.477 313.455 154.173 310.503C158.316 305.968 280.051 200.997 319.123 168.267C333.416 156.293 336.634 155.378 343.351 161.375Z"
+              fill="url(#paint2_linear)"
+            />
+            <defs>
+              <linearGradient id="paint1_linear" x1="500" y1="146.499" x2="500" y2="637.499" gradientUnits="userSpaceOnUse">
+                <stop offset="0.222678" stop-color="#9E00FF" stop-opacity="0.08" />
+                <stop offset="0.407678" stop-color="#f97316" stop-opacity="0.15" />
+                <stop offset="0.557678" stop-color="#f97316" stop-opacity="0.35" />
+                <stop offset="0.685425" stop-color="#f59e0b" stop-opacity="0.2" />
+                <stop offset="0.827678" stop-color="#f59e0b" stop-opacity="0.05" />
+                <stop offset="1" stop-color="#f59e0b" stop-opacity="0" />
+              </linearGradient>
+              <linearGradient id="paint2_linear" x1="500" y1="270.5" x2="500" y2="502" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#9E00FF" stop-opacity="0" />
+                <stop offset="0.35" stop-color="#9E00FF" stop-opacity="0.3" />
+                <stop offset="0.6" stop-color="#f97316" stop-opacity="0.7" />
+                <stop offset="0.787678" stop-color="#1f2937" />
+                <stop offset="1" stop-color="#f97316" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <!-- Animated progress bar -->
+        <div class="loading-progress">
+          <div class="loading-progress-bar"></div>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
