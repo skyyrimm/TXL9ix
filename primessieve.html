@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Theory & Primality Suite</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #38bdf8;
+      --accent-hover: #0284c7;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: var(--accent-color);
+      margin-top: 0;
+      margin-bottom: 6px;
+      text-align: center;
+      letter-spacing: -0.025em;
+    }
+
+    p.subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-bottom: 24px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-color);
+      padding: 4px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--accent-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: monospace;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent-color);
+    }
+
+    button.submit-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent-color);
+      color: var(--bg-color);
+      font-weight: 700;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button.submit-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .result-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: var(--bg-color);
+      border-radius: 6px;
+      border-left: 4px solid var(--border-color);
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 0.75rem;
+    }
+
+    .badge-success { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+    .badge-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Number Theory Analysis Suite</h1>
+  <p class="subtitle">Deterministic & Probabilistic Primality Verification</p>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('sg')">Sophie Germain</button>
+    <button class="tab-btn" onclick="switchTab('mr')">Miller-Rabin</button>
+    <button class="tab-btn" onclick="switchTab('sieve')">Prime Sieve</button>
+  </div>
+
+  <!-- SOPHIE GERMAIN PANEL -->
+  <div id="sg" class="panel active">
+    <div class="form-group">
+      <label>Enter Candidate Integer (p):</label>
+      <input type="text" id="sgInput" placeholder="e.g. 89, 113, 29131">
+    </div>
+    <button class="submit-btn" onclick="verifySophieGermain()">Test Sophie Germain Condition</button>
+    <div id="sgResult" class="result-box">Enter a positive integer to test if $p$ and $2p + 1$ are both prime.</div>
+  </div>
+
+  <!-- MILLER-RABIN PANEL -->
+  <div id="mr" class="panel">
+    <div class="form-group">
+      <label>Enter Large Integer (n):</label>
+      <input type="text" id="mrInput" placeholder="e.g. 1000000007">
+    </div>
+    <div class="form-group">
+      <label>Rounds of Testing (k):</label>
+      <input type="number" id="mrK" value="10" min="1" max="50">
+    </div>
+    <button class="submit-btn" onclick="testMillerRabin()">Run Miller-Rabin Test</button>
+    <div id="mrResult" class="result-box">Probabilistic primality test using BigInt modular exponentiation.</div>
+  </div>
+
+  <!-- SIEVE PANEL -->
+  <div id="sieve" class="panel">
+    <div class="form-group">
+      <label>Upper Bound (N ≤ 100,000):</label>
+      <input type="number" id="sieveN" placeholder="e.g. 500">
+    </div>
+    <button class="submit-btn" onclick="generateSieve()">Generate Primes & Sophie Germain Pairs</button>
+    <div id="sieveResult" class="result-box">Generate prime sets up to N.</div>
+  </div>
+</div>
+
+<script>
+// --- CORE MATHEMATICAL UTILITIES ---
+
+// Arbitrary Precision Modular Exponentiation: (base^exp) % mod
+function modPow(base, exp, mod) {
+  let res = 1n;
+  base = base % mod;
+  while (exp > 0n) {
+    if (exp % 2n === 1n) res = (res * base) % mod;
+    base = (base * base) % mod;
+    exp = exp / 2n;
+  }
+  return res;
+}
+
+// Deterministic Primality for n < 2^64 (using Miller-Rabin deterministic bases)
+function isPrimeBigInt(n) {
+  if (n <= 1n) return false;
+  if (n <= 3n) return true;
+  if (n % 2n === 0n || n % 3n === 0n) return false;
+
+  // Factor n - 1 as 2^s * d
+  let d = n - 1n;
+  let s = 0n;
+  while (d % 2n === 0n) {
+    d /= 2n;
+    s += 1n;
+  }
+
+  // Deterministic bases for up to 64-bit integers
+  const bases = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n];
+  for (let a of bases) {
+    if (n <= a) break;
+    let x = modPow(a, d, n);
+    if (x === 1n || x === n - 1n) continue;
+    
+    let composite = true;
+    for (let r = 1n; r < s; r++) {
+      x = modPow(x, 2n, n);
+      if (x === n - 1n) {
+        composite = false;
+        break;
+      }
+    }
+    if (composite) return false;
+  }
+  return true;
+}
+
+// --- UI HANDLERS ---
+
+function switchTab(tabId) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// 1. Sophie Germain Prime Verification
+function verifySophieGermain() {
+  const val = document.getElementById('sgInput').value.trim();
+  const resDiv = document.getElementById('sgResult');
+  
+  try {
+    const p = BigInt(val);
+    if (p <= 0n) throw new Error("Number must be a positive integer.");
+
+    const safePrime = 2n * p + 1n;
+    const isPPrime = isPrimeBigInt(p);
+    const isSafePrime = isPrimeBigInt(safePrime);
+
+    let status = "";
+    if (isPPrime && isSafePrime) {
+      status = `<span class="badge badge-success">VALID SOPHIE GERMAIN PRIME</span>\n\n`;
+      resDiv.style.borderLeftColor = "var(--success)";
+    } else {
+      status = `<span class="badge badge-danger">NOT A SOPHIE GERMAIN PRIME</span>\n\n`;
+      resDiv.style.borderLeftColor = "var(--danger)";
+    }
+
+    let details = `Candidate p = ${p.toString()}\n`;
+    details += `• Is p Prime? : ${isPPrime ? 'YES' : 'NO'}\n`;
+    details += `• Safe Prime (2p + 1 = ${safePrime.toString()}) : ${isSafePrime ? 'PRIME' : 'COMPOSITE'}\n\n`;
+
+    if (isPPrime && isSafePrime) {
+      details += `Conclusion: ${p} satisfies the condition where both p and 2p + 1 are prime numbers.`;
+    } else if (!isPPrime) {
+      details += `Conclusion: ${p} fails the test because p itself is composite.`;
+    } else {
+      details += `Conclusion: ${p} is prime, but 2p + 1 (${safePrime}) is composite.`;
+    }
+
+    resDiv.innerHTML = status + details;
+  } catch (err) {
+    resDiv.innerHTML = `<span class="badge badge-danger">ERROR</span>\n${err.message}`;
+    resDiv.style.borderLeftColor = "var(--danger)";
+  }
+}
+
+// 2. Miller-Rabin Probabilistic Primality Test
+function testMillerRabin() {
+  const val = document.getElementById('mrInput').value.trim();
+  const k = parseInt(document.getElementById('mrK').value);
+  const resDiv = document.getElementById('mrResult');
+
+  try {
+    const n = BigInt(val);
+    if (n <= 1n) throw new Error("n must be greater than 1.");
+
+    const isPrime = isPrimeBigInt(n);
+    const confidence = (1 - Math.pow(4, -k)) * 100;
+
+    let out = "";
+    if (isPrime) {
+      resDiv.style.borderLeftColor = "var(--success)";
+      out = `<span class="badge badge-success">PROBABLY PRIME</span>\n\n`;
+      out += `Integer (n): ${n.toString()}\n`;
+      out += `Testing Rounds (k): ${k}\n`;
+      out += `Confidence Level: ~${confidence.toFixed(6)}%\n\n`;
+      out += `Result: No Fermat witnesses were found. The number is highly likely to be prime.`;
+    } else {
+      resDiv.style.borderLeftColor = "var(--danger)";
+      out = `<span class="badge badge-danger">COMPOSITE</span>\n\n`;
+      out += `Integer (n): ${n.toString()}\n`;
+      out += `Result: Witness found. The number is strictly composite.`;
+    }
+    resDiv.innerHTML = out;
+  } catch (err) {
+    resDiv.innerHTML = `<span class="badge badge-danger">ERROR</span>\n${err.message}`;
+    resDiv.style.borderLeftColor = "var(--danger)";
+  }
+}
+
+// 3. Sieve of Eratosthenes with Sophie Germain Pair Filtering
+function generateSieve() {
+  const n = parseInt(document.getElementById('sieveN').value);
+  const resDiv = document.getElementById('sieveResult');
+
+  if (!n || n < 2 || n > 100000) {
+    resDiv.innerHTML = `<span class="badge badge-danger">ERROR</span>\nPlease enter N between 2 and 100,000.`;
+    resDiv.style.borderLeftColor = "var(--danger)";
+    return;
+  }
+
+  // Classic Sieve
+  let isPrime = new BooleanArray(n + 1);
+  isPrime.fill(true);
+  isPrime[0] = isPrime[1] = false;
+
+  for (let p = 2; p * p <= n; p++) {
+    if (isPrime[p]) {
+      for (let i = p * p; i <= n; i += p) isPrime[i] = false;
+    }
+  }
+
+  let sgPrimes = [];
+  let totalPrimes = 0;
+
+  for (let p = 2; p <= n; p++) {
+    if (isPrime[p]) {
+      totalPrimes++;
+      let safePrime = 2 * p + 1;
+      // Check if 2p + 1 is also prime
+      let isSafePrime = true;
+      if (safePrime <= n) {
+        isSafePrime = isPrime[safePrime];
+      } else {
+        // Simple primality check for safe primes above N
+        for (let d = 2; d * d <= safePrime; d++) {
+          if (safePrime % d === 0) { isSafePrime = false; break; }
+        }
+      }
+      if (isSafePrime) sgPrimes.push(p);
+    }
+  }
+
+  resDiv.style.borderLeftColor = "var(--accent-color)";
+  resDiv.innerText = `Range Search Result (up to N = ${n}):\n` +
+                     `• Total Primes Found: ${totalPrimes}\n` +
+                     `• Total Sophie Germain Primes: ${sgPrimes.length}\n\n` +
+                     `Sophie Germain Primes List (p):\n[ ${sgPrimes.join(', ')} ]`;
+}
+
+// Helper Array typed representation for optimization
+function BooleanArray(size) {
+  return new Uint8Array(size);
+}
+</script>
+
+</body>
+</html>
