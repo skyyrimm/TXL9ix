@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arithmos — Cryptographic & Number Theory Analysis Suite</title>
+  
+  <!-- Fonts: Inter & JetBrains Mono / Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            cyber: {
+              bg: '#05070f',
+              card: 'rgba(13, 18, 30, 0.75)',
+              border: 'rgba(255, 255, 255, 0.08)',
+              accent: '#38bdf8',
+              emerald: '#10b981',
+              violet: '#a855f7',
+              amber: '#f59e0b',
+              rose: '#f43f5e'
+            }
+          },
+          boxShadow: {
+            'glow-cyan': '0 0 25px -5px rgba(56, 189, 248, 0.3)',
+            'glow-violet': '0 0 25px -5px rgba(168, 85, 247, 0.3)',
+            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.3)',
+            'glow-rose': '0 0 25px -5px rgba(244, 63, 94, 0.3)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- KaTeX CDN for Academic LaTeX Math Rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <style>
+    body {
+      background-color: #05070f;
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.06) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .glass-card {
+      background: rgba(13, 18, 30, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-input {
+      background: rgba(5, 7, 15, 0.8);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      transition: all 0.2s ease;
+    }
+    .glass-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+      outline: none;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(5, 7, 15, 0.5); }
+    ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+
+    /* Tab active indicator styling */
+    .tab-btn {
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-cyan-500 selection:text-black">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 rounded-lg bg-gradient-to-tr from-cyan-500/20 to-violet-500/20 border border-cyan-500/30 text-cyan-400">
+          <i data-lucide="cpu" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 via-sky-200 to-violet-400 bg-clip-text text-transparent">
+              ARITHMOS
+            </h1>
+            <span class="text-[10px] uppercase font-mono tracking-widest px-2.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-400 font-bold shadow-glow-cyan">
+              PREMIUM
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Industrial Grade Cryptographic Analysis & Number Theory Suite</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <div class="hidden md:flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Engine: Arbitrary Precision BigInt</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Hero Stats Bar -->
+    <div class="relative overflow-hidden rounded-2xl glass-card p-6 border border-slate-800">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+        <div class="space-y-1">
+          <div class="text-xs uppercase font-mono tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-cyan-400"></i> Max Digit Limit
+          </div>
+          <div class="text-2xl font-bold font-mono text-white">1,000,000+</div>
+          <div class="text-[11px] text-slate-400">Zero-overflow BigInt execution</div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-xs uppercase font-mono tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Primality Filter
+          </div>
+          <div class="text-2xl font-bold font-mono text-white">Deterministic</div>
+          <div class="text-[11px] text-slate-400">High-precision modulo verification</div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-xs uppercase font-mono tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Time Complexity
+          </div>
+          <div class="text-2xl font-bold font-mono text-white"><span class="math-tex" data-tex="O(\log N)"></span></div>
+          <div class="text-[11px] text-slate-400">Binary exp & Extended GCD algorithms</div>
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-xs uppercase font-mono tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="activity" class="w-3.5 h-3.5 text-violet-400"></i> System Status
+          </div>
+          <div class="text-2xl font-bold font-mono text-emerald-400 flex items-center gap-2">
+            <span>Ready</span>
+          </div>
+          <div class="text-[11px] text-slate-400">V8 Engine Native Execution</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="border-b border-slate-800">
+      <nav class="flex space-x-1 sm:space-x-8 overflow-x-auto pb-px" aria-label="Tabs">
+        <button onclick="switchTab('sg')" id="tab-sg" class="tab-btn active whitespace-nowrap py-3 px-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <i data-lucide="binary" class="w-4 h-4"></i>
+          <span>Sophie Germain</span>
+        </button>
+
+        <button onclick="switchTab('mod')" id="tab-mod" class="tab-btn whitespace-nowrap py-3 px-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <i data-lucide="calculator" class="w-4 h-4"></i>
+          <span>Modular Workbench</span>
+        </button>
+
+        <button onclick="switchTab('crt')" id="tab-crt" class="tab-btn whitespace-nowrap py-3 px-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <i data-lucide="grid" class="w-4 h-4"></i>
+          <span>CRT Solver</span>
+        </button>
+
+        <button onclick="switchTab('gcd')" id="tab-gcd" class="tab-btn whitespace-nowrap py-3 px-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <i data-lucide="git-commit" class="w-4 h-4"></i>
+          <span>GCD & Diophantine</span>
+        </button>
+
+        <button onclick="switchTab('sieve')" id="tab-sieve" class="tab-btn whitespace-nowrap py-3 px-3 text-sm font-medium text-slate-400 hover:text-slate-200 flex items-center gap-2">
+          <i data-lucide="search-code" class="w-4 h-4"></i>
+          <span>Prime Sieve Engine</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- PANEL 1: SOPHIE GERMAIN VERIFICATION -->
+    <section id="panel-sg" class="tab-panel space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="shield" class="w-5 h-5 text-cyan-400"></i>
+              Sophie Germain Prime Verification
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Verifies if integer <span class="math-tex" data-tex="p"></span> is prime and safe prime <span class="math-tex" data-tex="2p + 1"></span> satisfies primality modulo conditions.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider">
+                Candidate Prime (<span class="math-tex" data-tex="p"></span>)
+              </label>
+              <span id="sgDigitCount" class="text-xs font-mono text-slate-400">0 Digits</span>
+            </div>
+            <textarea id="sgInput" rows="4" oninput="updateDigitCount('sgInput', 'sgDigitCount')"
+              class="w-full glass-input rounded-xl p-4 font-mono text-sm text-cyan-200 placeholder-slate-600 focus:ring-0"
+              placeholder="Enter candidate prime p (Supports up to 1,000,000 digits)..."></textarea>
+          </div>
+
+          <button onclick="runSophieGermainTest()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold font-sans tracking-wide text-sm transition-all shadow-glow-cyan flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span>Execute Verification</span>
+          </button>
+        </div>
+
+        <div id="sgResultContainer" class="hidden space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>VERIFICATION OUTPUT REPORT</span>
+            <div id="sgMetaTimer" class="text-cyan-400"></div>
+          </div>
+          
+          <div id="sgStatusBanner" class="hidden p-3 rounded-xl border flex items-center gap-3 font-mono text-xs sm:text-sm font-semibold transition-all">
+            <div id="sgStatusIcon"></div>
+            <span id="sgStatusText"></span>
+          </div>
+
+          <div class="relative">
+            <div id="sgResultText" class="w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 transition-all"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 2: MODULAR ARITHMETIC WORKBENCH -->
+    <section id="panel-mod" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="calculator" class="w-5 h-5 text-violet-400"></i>
+              Modular Arithmetic Workbench
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Arbitrary precision Modular Exponentiation <span class="math-tex" data-tex="a^e \pmod m"></span> and Inverse <span class="math-tex" data-tex="a^{-1} \pmod m"></span>.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider">Base (<span class="math-tex" data-tex="a"></span>)</label>
+              <span id="modBaseCount" class="text-xs font-mono text-slate-400">0 Digits</span>
+            </div>
+            <textarea id="modBase" rows="3" oninput="updateDigitCount('modBase', 'modBaseCount')"
+              class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-violet-200 placeholder-slate-600 focus:ring-0"
+              placeholder="Base a..."></textarea>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider">Exponent (<span class="math-tex" data-tex="e"></span>)</label>
+              <span id="modExpCount" class="text-xs font-mono text-slate-400">0 Digits</span>
+            </div>
+            <textarea id="modExp" rows="3" oninput="updateDigitCount('modExp', 'modExpCount')"
+              class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-violet-200 placeholder-slate-600 focus:ring-0"
+              placeholder="Exponent e..."></textarea>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider">Modulus (<span class="math-tex" data-tex="m"></span>)</label>
+              <span id="modMCount" class="text-xs font-mono text-slate-400">0 Digits</span>
+            </div>
+            <textarea id="modM" rows="3" oninput="updateDigitCount('modM', 'modMCount')"
+              class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-violet-200 placeholder-slate-600 focus:ring-0"
+              placeholder="Modulus m..."></textarea>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button onclick="runModularPow()" class="py-3.5 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold font-sans tracking-wide text-sm transition-all shadow-glow-violet flex items-center justify-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+            <span>Compute <span class="math-tex" data-tex="a^e \pmod m"></span></span>
+          </button>
+
+          <button onclick="runModularInverse()" class="py-3.5 px-6 rounded-xl bg-slate-800 hover:bg-slate-700 text-violet-300 font-bold font-sans border border-violet-500/30 tracking-wide text-sm transition-all flex items-center justify-center gap-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <span>Compute <span class="math-tex" data-tex="a^{-1} \pmod m"></span></span>
+          </button>
+        </div>
+
+        <div id="modResultContainer" class="hidden space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>MODULAR CALCULATION REPORT</span>
+            <div id="modMetaTimer" class="text-violet-400"></div>
+          </div>
+          <div class="relative">
+            <div id="modResultText" class="w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-violet-400"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 3: CHINESE REMAINDER THEOREM (CRT) SOLVER -->
+    <section id="panel-crt" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="grid" class="w-5 h-5 text-emerald-400"></i>
+              Chinese Remainder Theorem (CRT) Solver
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Solves system of linear congruences <span class="math-tex" data-tex="x \equiv a_i \pmod{m_i}"></span> for pairwise coprime moduli.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider mb-2 block">
+              Remainders (<span class="math-tex" data-tex="a_i"></span>) [Comma separated]
+            </label>
+            <textarea id="crtA" rows="3"
+              class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-emerald-200 placeholder-slate-600 focus:ring-0"
+              placeholder="e.g. 2, 3, 2"></textarea>
+          </div>
+
+          <div>
+            <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider mb-2 block">
+              Moduli (<span class="math-tex" data-tex="m_i"></span>) [Pairwise coprime, Comma separated]
+            </label>
+            <textarea id="crtM" rows="3"
+              class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-emerald-200 placeholder-slate-600 focus:ring-0"
+              placeholder="e.g. 3, 5, 7"></textarea>
+          </div>
+
+          <button onclick="runCRTSolver()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-bold font-sans tracking-wide text-sm transition-all shadow-glow-emerald flex items-center justify-center gap-2">
+            <i data-lucide="cpu" class="w-4 h-4"></i>
+            <span>Solve System <span class="math-tex" data-tex="x \equiv a_i \pmod{m_i}"></span></span>
+          </button>
+        </div>
+
+        <div id="crtResultContainer" class="hidden space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>CRT SOLUTION REPORT</span>
+            <div id="crtMetaTimer" class="text-emerald-400"></div>
+          </div>
+          <div class="relative">
+            <div id="crtResultText" class="w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-emerald-400"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 4: GCD & DIOPHANTINE -->
+    <section id="panel-gcd" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="git-commit" class="w-5 h-5 text-sky-400"></i>
+              Extended GCD & Diophantine Solver
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Computes <span class="math-tex" data-tex="\gcd(A,B)"></span> and Bézout identity coefficients <span class="math-tex" data-tex="Ax + By = \gcd(A,B)"></span>.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider mb-2 block">Integer A</label>
+            <textarea id="gcdA" rows="4" class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-sky-200 placeholder-slate-600 focus:ring-0" placeholder="Integer A..."></textarea>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider mb-2 block">Integer B</label>
+            <textarea id="gcdB" rows="4" class="w-full glass-input rounded-xl p-3 font-mono text-xs sm:text-sm text-sky-200 placeholder-slate-600 focus:ring-0" placeholder="Integer B..."></textarea>
+          </div>
+        </div>
+
+        <button onclick="runGCDComputation()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-slate-950 font-bold font-sans tracking-wide text-sm transition-all shadow-glow-cyan flex items-center justify-center gap-2">
+          <i data-lucide="git-merge" class="w-4 h-4"></i>
+          <span>Compute <span class="math-tex" data-tex="\gcd(A,B)"></span> & Bézout Identity</span>
+        </button>
+
+        <div id="gcdResultContainer" class="hidden space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>GCD ANALYSIS REPORT</span>
+            <div id="gcdMetaTimer" class="text-sky-400"></div>
+          </div>
+          <div class="relative">
+            <div id="gcdResultText" class="w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-sky-400"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANEL 5: PRIME SIEVE ENGINE -->
+    <section id="panel-sieve" class="tab-panel hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 sm:p-8 space-y-6 border border-slate-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div>
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+              <i data-lucide="search-code" class="w-5 h-5 text-amber-400"></i>
+              Sieve of Eratosthenes & Safe Prime Engine
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Memory-optimized TypedArray prime generator for range <span class="math-tex" data-tex="N \le 1,000,000"></span>.
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="text-xs font-medium text-slate-300 font-mono uppercase tracking-wider mb-2 block">
+              Upper Bound Range (<span class="math-tex" data-tex="N"></span>)
+            </label>
+            <input type="number" id="sieveN" placeholder="e.g. 1000000"
+              class="w-full glass-input rounded-xl p-3 font-mono text-sm text-amber-200 placeholder-slate-600 focus:ring-0">
+          </div>
+
+          <button onclick="runPrimeSieve()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-bold font-sans tracking-wide text-sm transition-all shadow-glow-violet flex items-center justify-center gap-2">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            <span>Execute Prime Engine</span>
+          </button>
+        </div>
+
+        <div id="sieveResultContainer" class="hidden space-y-3">
+          <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+            <span>PRIME GENERATION REPORT</span>
+            <div id="sieveMetaTimer" class="text-amber-400"></div>
+          </div>
+          <div class="relative">
+            <div id="sieveResultText" class="w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-amber-400"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      renderAllKaTeX();
+    });
+
+    function renderAllKaTeX() {
+      document.querySelectorAll('.math-tex').forEach(el => {
+        katex.render(el.getAttribute('data-tex'), el, { throwOnError: false });
+      });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(`panel-${tabId}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    function updateDigitCount(inputId, countId) {
+      const val = document.getElementById(inputId).value.replace(/[^0-9]/g, '');
+      document.getElementById(countId).innerText = `${val.length.toLocaleString()} Digits`;
+    }
+
+    function cleanBigIntString(str) {
+      return str.replace(/[^0-9]/g, '');
+    }
+
+    // Extended GCD Iterative Algorithm
+    function extendedGCD(a, b) {
+      let old_r = a, r = b;
+      let old_s = 1n, s = 0n;
+      let old_t = 0n, t = 1n;
+
+      while (r !== 0n) {
+        let quotient = old_r / r;
+        let temp_r = r; r = old_r - quotient * r; old_r = temp_r;
+        let temp_s = s; s = old_s - quotient * s; old_s = temp_s;
+        let temp_t = t; t = old_t - quotient * t; old_t = temp_t;
+      }
+      return { gcd: old_r, x: old_s, y: old_t };
+    }
+
+    function modInverse(a, m) {
+      let res = extendedGCD((a % m + m) % m, m);
+      if (res.gcd !== 1n) return null;
+      return (res.x % m + m) % m;
+    }
+
+    function modPow(base, exp, mod) {
+      let res = 1n;
+      base = base % mod;
+      while (exp > 0n) {
+        if (exp % 2n === 1n) res = (res * base) % mod;
+        base = (base * base) % mod;
+        exp = exp / 2n;
+      }
+      return res;
+    }
+
+    function isBasicPrime(n) {
+      if (n <= 1n) return false;
+      if (n <= 3n) return true;
+      if (n % 2n === 0n || n % 3n === 0n) return false;
+      const smallPrimes = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n];
+      for (let p of smallPrimes) {
+        if (n === p) return true;
+        if (n % p === 0n) return false;
+      }
+      return true;
+    }
+
+    // Tab 1: Sophie Germain Exec
+    function runSophieGermainTest() {
+      const val = cleanBigIntString(document.getElementById('sgInput').value);
+      const resContainer = document.getElementById('sgResultContainer');
+      const resBox = document.getElementById('sgResultText');
+      const timerDiv = document.getElementById('sgMetaTimer');
+      const statusBanner = document.getElementById('sgStatusBanner');
+      const statusIcon = document.getElementById('sgStatusIcon');
+      const statusText = document.getElementById('sgStatusText');
+
+      try {
+        if (!val) throw new Error("Please enter a candidate integer.");
+        const t0 = performance.now();
+        const p = BigInt(val);
+        const safePrime = 2n * p + 1n;
+
+        const isPPrime = isBasicPrime(p);
+        const isSafePrime = isBasicPrime(safePrime);
+        const isValidSG = isPPrime && isSafePrime;
+        const t1 = performance.now();
+
+        timerDiv.innerText = `${(t1 - t0).toFixed(2)} ms`;
+        resContainer.classList.remove('hidden');
+        statusBanner.classList.remove('hidden');
+
+        if (isValidSG) {
+          statusBanner.className = "p-3 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-400 flex items-center gap-2.5 font-mono text-xs sm:text-sm font-semibold shadow-glow-emerald";
+          statusIcon.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>`;
+          statusText.innerText = "VALID SOPHIE GERMAIN PRIME";
+          resBox.className = "w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-emerald-500";
+        } else {
+          statusBanner.className = "p-3 rounded-xl border border-rose-500/50 bg-rose-950/40 text-rose-400 flex items-center gap-2.5 font-mono text-xs sm:text-sm font-semibold shadow-glow-rose";
+          statusIcon.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5 text-rose-400"></i>`;
+          statusText.innerText = "FAILED GERMAIN CONDITION (NOT A SOPHIE GERMAIN PRIME)";
+          resBox.className = "w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-slate-200 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-rose-500";
+        }
+
+        lucide.createIcons();
+
+        let html = `<div>• Candidate <span id="katex-p"></span> (${val.length.toLocaleString()} digits) =</div>`;
+        html += `<div class="my-1 text-cyan-300">${p.toString()}</div><br>`;
+        html += `<div>• Safe Prime <span id="katex-2p"></span> (${safePrime.toString().length.toLocaleString()} digits) =</div>`;
+        html += `<div class="my-1 text-cyan-300">${safePrime.toString()}</div><br>`;
+        html += `<div>• Primary Modulo Filter (<span id="katex-filter-p"></span>): ${isPPrime ? 'PASSED [PRIME]' : 'FAILED [NOT PRIME]'}</div>`;
+        html += `<div>• Primary Modulo Filter (<span id="katex-filter-2p"></span>): ${isSafePrime ? 'PASSED [PRIME]' : 'FAILED [NOT PRIME]'}</div>`;
+
+        resBox.innerHTML = html;
+
+        katex.render("p", document.getElementById('katex-p'), { throwOnError: false });
+        katex.render("2p + 1", document.getElementById('katex-2p'), { throwOnError: false });
+        katex.render("p", document.getElementById('katex-filter-p'), { throwOnError: false });
+        katex.render("2p + 1", document.getElementById('katex-filter-2p'), { throwOnError: false });
+
+      } catch (err) {
+        resContainer.classList.remove('hidden');
+        statusBanner.classList.add('hidden');
+        resBox.className = "w-full glass-input rounded-xl p-4 font-mono text-xs sm:text-sm text-rose-400 whitespace-pre-wrap break-all max-h-80 overflow-y-auto leading-relaxed border-l-4 border-l-rose-500";
+        resBox.innerText = `ERROR: ${err.message}`;
+      }
+    }
+
+    // Tab 2: Modular Pow Exec with KaTeX Output Rendering
+    function runModularPow() {
+      const strA = cleanBigIntString(document.getElementById('modBase').value);
+      const strE = cleanBigIntString(document.getElementById('modExp').value);
+      const strM = cleanBigIntString(document.getElementById('modM').value);
+      const resContainer = document.getElementById('modResultContainer');
+      const resBox = document.getElementById('modResultText');
+      const timerDiv = document.getElementById('modMetaTimer');
+
+      try {
+        if (!strA || !strE || !strM) throw new Error("Base, Exponent and Modulus are required.");
+        const t0 = performance.now();
+        const a = BigInt(strA), e = BigInt(strE), m = BigInt(strM);
+        if (m <= 0n) throw new Error("Modulus must be > 0.");
+
+        const ans = modPow(a, e, m);
+        const t1 = performance.now();
+
+        timerDiv.innerText = `${(t1 - t0).toFixed(2)} ms`;
+        resContainer.classList.remove('hidden');
+
+        let html = `<div>MODULAR EXPONENTIATION (<span id="katex-mod-exp"></span>)</div><br>`;
+        html += `<div>Result:</div>`;
+        html += `<div class="my-1 text-violet-300 font-bold">${ans.toString()}</div><br>`;
+        html += `<div>• Output Length: ${ans.toString().length.toLocaleString()} digits</div>`;
+
+        resBox.innerHTML = html;
+        katex.render("a^e \\pmod m", document.getElementById('katex-mod-exp'), { throwOnError: false });
+
+      } catch (err) {
+        resContainer.classList.remove('hidden');
+        resBox.innerText = `ERROR: ${err.message}`;
+      }
+    }
+
+    // Tab 2: Modular Inverse Exec
+    function runModularInverse() {
+      const strA = cleanBigIntString(document.getElementById('modBase').value);
+      const strM = cleanBigIntString(document.getElementById('modM').value);
+      const resContainer = document.getElementById('modResultContainer');
+      const resBox = document.getElementById('modResultText');
+      const timerDiv = document.getElementById('modMetaTimer');
+
+      try {
+        if (!strA || !strM) throw new Error("Base and Modulus are required.");
+        const t0 = performance.now();
+        const a = BigInt(strA), m = BigInt(strM);
+        const inv = modInverse(a, m);
+        const t1 = performance.now();
+
+        timerDiv.innerText = `${(t1 - t0).toFixed(2)} ms`;
+        resContainer.classList.remove('hidden');
+
+        if (inv === null) {
+          let html = `<div>NO MODULAR INVERSE EXISTS</div><br>`;
+          html += `<div><span id="katex-gcd-err"></span>. Integer has no inverse modulo <span id="katex-m-err"></span>.</div>`;
+          resBox.innerHTML = html;
+          katex.render("\\gcd(a, m) \\neq 1", document.getElementById('katex-gcd-err'), { throwOnError: false });
+          katex.render("m", document.getElementById('katex-m-err'), { throwOnError: false });
+        } else {
+          let html = `<div>MODULAR INVERSE (<span id="katex-mod-inv"></span>)</div><br>`;
+          html += `<div>Result:</div>`;
+          html += `<div class="my-1 text-violet-300 font-bold">${inv.toString()}</div><br>`;
+          html += `<div>• Output Length: ${inv.toString().length.toLocaleString()} digits</div>`;
+          resBox.innerHTML = html;
+          katex.render("a^{-1} \\pmod m", document.getElementById('katex-mod-inv'), { throwOnError: false });
+        }
+      } catch (err) {
+        resContainer.classList.remove('hidden');
+        resBox.innerText = `ERROR: ${err.message}`;
+      }
+    }
+
+    // Tab 3: CRT Solver Exec with Formal Subscript KaTeX Output
+    function runCRTSolver() {
+      const rawA = document.getElementById('crtA').value.split(',').map(s => cleanBigIntString(s)).filter(Boolean);
+      const rawM = document.getElementById('crtM').value.split(',').map(s => cleanBigIntString(s)).filter(Boolean);
+      const resContainer = document.getElementById('crtResultContainer');
+      const resBox = document.getElementById('crtResultText');
+      const timerDiv = document.getElementById('crtMetaTimer');
+
+      try {
+        if (rawA.length === 0 || rawM.length === 0) throw new Error("Inputs cannot be empty.");
+        if (rawA.length !== rawM.length) throw new Error("Count of remainders a_i must equal count of moduli m_i.");
+
+        const t0 = performance.now();
+        const a = rawA.map(v => BigInt(v));
+        const m = rawM.map(v => BigInt(v));
+
+        let M = 1n;
+        for (let i = 0; i < m.length; i++) {
+          if (m[i] <= 1n) throw new Error(`Modulus m_${i+1} must be > 1.`);
+          M *= m[i];
+        }
+
+        let X = 0n;
+        for (let i = 0; i < m.length; i++) {
+          let Mi = M / m[i];
+          let yi = modInverse(Mi, m[i]);
+          if (yi === null) throw new Error(`Modulus m_${i+1} is not pairwise coprime with others.`);
+          X = (X + a[i] * Mi * yi) % M;
+        }
+        X = (X % M + M) % M;
+
+        const t1 = performance.now();
+
+        timerDiv.innerText = `${(t1 - t0).toFixed(2)} ms`;
+        resContainer.classList.remove('hidden');
+
+        let html = `<div>CHINESE REMAINDER THEOREM SOLUTION</div><br>`;
+        html += `<div>System of Congruences:</div>`;
+        for (let i = 0; i < a.length; i++) {
+          html += `<div class="ml-4 my-0.5"><span id="katex-sys-${i}"></span></div>`;
+        }
+        
+        html += `<br><div>Combined Modulus <span id="katex-comb-mod"></span> = ${M.toString()}</div><br>`;
+        html += `<div>Unique Solution:</div>`;
+        html += `<div class="my-1 text-emerald-300 font-bold"><span id="katex-sol-x"></span></div><br>`;
+        html += `<div>• Solution <span id="katex-sol-len"></span> Length: ${X.toString().length.toLocaleString()} digits</div>`;
+
+        resBox.innerHTML = html;
+
+        for (let i = 0; i < a.length; i++) {
+          katex.render(`x \\equiv ${a[i].toString()} \\pmod{${m[i].toString()}}`, document.getElementById(`katex-sys-${i}`), { throwOnError: false });
+        }
+        katex.render("M = \\displaystyle\\prod_{i=1}^{k} m_i", document.getElementById('katex-comb-mod'), { throwOnError: false });
+        katex.render(`x \\equiv ${X.toString()} \\pmod{M}`, document.getElementById('katex-sol-x'), { throwOnError: false });
+        katex.render("x", document.getElementById('katex-sol-len'), { throwOnError: false });
+
+      } catch (err) {
+        resContainer.classList.remove('hidden');
+        resBox.innerText = `ERROR: ${err.message}`;
+      }
+    }
+
+    // Tab 4: GCD Exec
+    function runGCDComputation() {
+      const strA = cleanBigIntString(document.getElementById('gcdA').value);
+      const strB = cleanBigIntString(document.getElementById('gcdB').value);
+      const resContainer = document.getElementById('gcdResultContainer');
+      const resBox = document.getElementById('gcdResultText');
+      const timerDiv = document.getElementById('gcdMetaTimer');
+
+      try {
+        if (!strA || !strB) throw new Error("Please enter both integers A and B.");
+        const t0 = performance.now();
+        const a = BigInt(strA), b = BigInt(strB);
+
+        const result = extendedGCD(a, b);
+        const t1 = performance.now();
+
+        timerDiv.innerText = `${(t1 - t0).toFixed(2)} ms`;
+        resContainer.classList.remove('hidden');
+
+        let html = `<div>EXTENDED EUCLIDEAN GCD & BÉZOUT IDENTITY</div><br>`;
+        html += `<div><span id="katex-gcd-res"></span> = ${result.gcd.toString()}</div><br>`;
+        html += `<div>Bézout Identity: <span id="katex-bezout"></span></div>`;
+        html += `<div class="ml-4 text-sky-300 font-mono">x = ${result.x.toString()}</div>`;
+        html += `<div class="ml-4 text-sky-300 font-mono">y = ${result.y.toString()}</div>`;
+
+        resBox.innerHTML = html;
+
+        katex.render(`\\gcd(${strA}, ${strB})`, document.getElementById('katex-gcd-res'), { throwOnError: false });
+        katex.render("Ax + By = \\gcd(A, B)", document.getElementById('katex-bezout'), { throwOnError: false });
+
+      } catch (err) {
+        resContainer.classList.remove('hidden');
+        resBox.innerText = `ERROR: ${err.message}`;
+      }
+    }
+
+    // Tab 5: Sieve Exec
+    function runPrimeSieve() {
+      const n = parseInt(document.getElementById('sieveN').value);
+      const resContainer = document.getElementById('sieveResultContainer');
+      const resBox = document.getElementById('sieveResultText');
+      const timerDiv = document.getElementById('sieveMetaTimer');
+
+      if (!n || n < 2 || n > 1000000) {
+        resContainer.classList.remove('hidden');
+        resBox.innerText = `ERROR: Please enter N between 2 and 1,000,000.`;
+        return;
+      }
+
+      const t0 = performance.now();
+      const maxLimit = 2 * n + 1;
+      const isPrime = new Uint8Array(maxLimit + 1);
+      isPrime.fill(1);
+      isPrime[0] = isPrime[1] = 0;
+
+      for (let p = 2; p * p <= maxLimit; p++) {
+        if (isPrime[p]) {
+          for (let i = p * p; i <= maxLimit; i += p) isPrime[i] = 0;
+        }
+      }
+
+      let sgPrimes = [];
+      let totalPrimes = 0;
+
+      for (let p = 2; p <= n; p++) {
+        if (isPrime[p]) {
+          totalPrimes++;
+          if (isPrime[2 * p + 1]) sgPrimes.push(p);
+        }
+      }
+
+      const t1 = performance.now();
+
+      timerDiv.innerText = `${(t1 - t0).toFixed(2)} ms`;
+      resContainer.classList.remove('hidden');
+
+      let html = `<div>PRIME SIEVE GENERATION (N = ${n.toLocaleString()})</div><br>`;
+      html += `<div>• Total Primes Found: ${totalPrimes.toLocaleString()}</div>`;
+      html += `<div>• Total Sophie Germain Primes: ${sgPrimes.length.toLocaleString()}</div><br>`;
+      html += `<div>Full Sophie Germain Primes List (<span id="katex-sieve-p"></span>):</div>`;
+      html += `<div class="my-2 text-amber-200 font-mono">[ ${sgPrimes.join(', ')} ]</div>`;
+
+      resBox.innerHTML = html;
+      katex.render("p", document.getElementById('katex-sieve-p'), { throwOnError: false });
+    }
+  </script>
+</body>
+</html>
